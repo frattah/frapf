@@ -1,40 +1,7 @@
-import re
 import keyword
 import globals
 import requests
 from bs4 import BeautifulSoup
-
-def cmpDates(date1, date2):
-    """
-        Return True if date1 is before date2 or they are equals
-    """
-    date1 = date1.split('-')
-    date2 = date2.split('-')
-    if date1[0] == date2[0]:
-        if date1[1] == date2[1]:
-            return date1[2] == '??' or date1[2] <= date2[2] or date2[2] == '??'
-        else:
-            return date1[1] <= date2[1]
-    else:
-        return date1[0] <= date2[0]
-    
-def parseRangeDates(expression):
-    """
-        Replace all range dates like ****-**-** | ****-**-** using the cmpDates() function
-    """
-    
-    patt = 0
-    
-    while patt != None:
-
-        patt = re.search(globals.DATE_PATTERN + '[ ]*[|]{1}[ ]*' + globals.DATE_PATTERN, expression, patt.end() if patt != 0 else 0)
-        if patt != None:
-            tmp = patt.group()
-            tmp = tmp.split()
-            expression = expression.replace(tmp[0], "cmpDates('" + tmp[0] + "',row['date'])")
-            expression = expression.replace(tmp[1], " and ", 1)
-            expression = expression.replace(tmp[2], "cmpDates(row['date'],'" + tmp[2] + "')")
-    return expression
 
 def parseBlock(expression, arguments):
     """
@@ -45,21 +12,18 @@ def parseBlock(expression, arguments):
     for i in globals.OPERATORS:
         expression = expression.replace(i, i + ' ')
 
-    expression = parseRangeDates(expression)
-
     tmp = expression.split()
     for i in range(0, len(tmp)):
 
+        if isCurrency(tmp[i]):
+            tmp[i] = tmp[i].upper()
+
+        # Expand arguments
         if tmp[i].lower() in arguments:
             tmp[i] = "row['" + tmp[i].lower() + "']"
 
-        elif re.match(globals.DATE_PATTERN, tmp[i]):
-            tmp[i] = "fnmatch.fnmatch(row['date'], '" + str(tmp[i]) + "')"
-
-        elif tmp[i].upper() == "NULL":
-            tmp[i] = "'NULL'"
-        
-        elif not(keyword.iskeyword(tmp[i])) and tmp[i] not in globals.OPERATORS and tmp[i][:9] != "cmpDates(":
+        # Make string from non keyword and non operators words
+        elif not(keyword.iskeyword(tmp[i])) and tmp[i] not in globals.OPERATORS:
             tmp[i] = "'" + tmp[i] + "'"
 
         tmp[i] = ' ' + tmp[i]
@@ -93,3 +57,10 @@ def investValue(row):
         globals.tickers[ticker] = price
 
     return float(price) * int(stocks_number)
+
+def isCurrency(a):
+    if len(a) != 3:
+        return False
+    if a.upper() in globals.CURRENCIES:
+        return True
+    return False

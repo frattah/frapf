@@ -1,8 +1,18 @@
 
-OPERATORS = ["<", "<=", ">", ">=", "==", "!=", "(", ")", "|"]
+OPERATORS = ["<", ">", "==", "!=", "(", ")"]
 
 GOOGLE_FINANCE_URL = "https://www.google.com/finance"
 
-DATE_PATTERN = r'([0-9]{4}|[?]{4})-([01]{1}[0-9]{1}|[?]{2})-([0-3]{1}[0-9]{1}|[?]{2})'
-
 tickers = {}
+
+CURRENCIES = ["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT",
+              "BGN","BHD","BND","BOB","BRL","BSD","BTN","BWP","BYR","BZD","CAD","CHF","CLP",
+              "CNY","COP","CRC","CZK","DKK","DOP","DZD","EGP","ETB","EUR","FJD","GBP","GEL",
+              "GHS","GMD","GTQ","GYD","HKD","HNL","HRK","HUF","IDR","ILS","INR","ISK","JEP",
+              "JMD","JOD","JPY","KES","KGS","KHR","KRW","KWD","KYD","KZT","LBP","LKR","LTL",
+              "LVL","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MUR","MVR","MXN","MYR","MZN",
+              "NAD","NGN","NIO","NOK","NPR","NZD","OMR","PEN","PGK","PHP","PKR","PLN","PYG",
+              "QAR","RON","RSD","RUB","RWF","SAR","SCR","SEK","SGD","STD","SYP","THB","TND",
+              "TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","VEF","VND","VUV","WST","XAF",
+              "XBT","XCD","XOF","XPF","ZAR","ZMW"]
+
