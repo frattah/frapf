@@ -15,9 +15,6 @@ def parseBlock(expression, arguments):
     tmp = expression.split()
     for i in range(0, len(tmp)):
 
-        if isCurrency(tmp[i]):
-            tmp[i] = tmp[i].upper()
-
         # Expand arguments
         if tmp[i].lower() in arguments:
             tmp[i] = "row['" + tmp[i].lower() + "']"
@@ -45,22 +42,25 @@ def investValue(row):
     # Access to google finance
     try:
         price = globals.tickers[ticker]
-        print(price)
     except KeyError:
         url = f"{globals.GOOGLE_FINANCE_URL}/quote/{ticker}:{market}?hl=en"
         page = requests.get(url)
 
         soup = BeautifulSoup(page.content, "html.parser")
-        items = soup.find_all("div", {"class": "AHmHk"})
-        price = items[0].find("div", {"class": "YMlKec fxKbKc"}).text
-        price = price[1:]
+        price = float(soup.find("div", class_="YMlKec fxKbKc").text[1:])
         globals.tickers[ticker] = price
 
     return float(price) * int(stocks_number)
 
-def isCurrency(a):
-    if len(a) != 3:
-        return False
-    if a.upper() in globals.CURRENCIES:
-        return True
-    return False
+def currencyConvertion(currency):
+    """
+        Given a currency code return the change from EUR
+    """
+
+    url = f"{globals.GOOGLE_FINANCE_URL}/quote/EUR-{currency}?hl=en"
+    page = requests.get(url)
+
+    soup = BeautifulSoup(page.content, "html.parser")
+    convertion = float(soup.find("div", class_="YMlKec fxKbKc").text.replace(",", ""))
+    
+    return convertion
