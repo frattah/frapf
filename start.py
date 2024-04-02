@@ -1,4 +1,4 @@
-import csv
+import pandas as pd
 import fnmatch
 import parsing
 import re
@@ -8,34 +8,31 @@ def doQuery(query, reader):
         Perform the query passed by argument
     """
     res = 0
-    for row in reader:
+    for i, row in reader.iterrows():
         if eval(query):
-            if row['tag'] == 'investment' and float(row['amount']) > 0:
+            if row['tag'] == 'security' and float(row['amount']) > 0:
                 res += parsing.investValue(row)
             else:
                 res += float(row['amount'])
     return round(res,3)
 
 def start(query):
-    with open('personal_finance.csv', newline='') as csvfile:
+    reader = pd.read_csv('personal_finance.csv', delimiter=',')
+    # User Interface
+    arguments = list(reader.columns)
 
-        reader = csv.DictReader(csvfile)
+    currency = 'EUR'
+    match = re.search(r"in[ ]{1}[a-zA-Z]{3}", query)
+    if match != None:
+        currency = match.group()[-3:].upper()
+        query = query.replace(match.group(), "")
 
-        # User Interface
-        arguments = list(next(reader))
+    # query parsing
+    query = parsing.parseBlock(query, arguments)
 
-        currency = 'EUR'
-        match = re.search(r"in[ ]{1}[a-zA-Z]{3}", query)
-        if match != None:
-            currency = match.group()[-3:].upper()
-            query = query.replace(match.group(), "")
+    result = doQuery(query, reader)
+    if currency != 'EUR':
+        result = round(result * parsing.currencyConvertion(currency), 2)
 
-        # query parsing
-        query = parsing.parseBlock(query, arguments)
-        result = doQuery(query, reader)
-
-        if currency != 'EUR':
-            result = round(result * parsing.currencyConvertion(currency), 2)
-
-        print("\n\n    result = ", result, currency)
-        print("\n\n")
+    print("\n\n    result = ", result, currency)
+    print("\n\n")

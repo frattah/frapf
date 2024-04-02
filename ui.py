@@ -1,4 +1,3 @@
-from csv import writer
 from datetime import date
 import windows
 

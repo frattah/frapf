@@ -20,7 +20,7 @@ def parseBlock(expression, arguments):
             tmp[i] = "row['" + tmp[i].lower() + "']"
 
         # Make string from non keyword and non operators words
-        elif not(keyword.iskeyword(tmp[i])) and tmp[i] not in globals.OPERATORS:
+        elif not(keyword.iskeyword(tmp[i])) and tmp[i] not in globals.OPERATORS and not(tmp[i].isdigit()):
             tmp[i] = "'" + tmp[i] + "'"
 
         tmp[i] = ' ' + tmp[i]
